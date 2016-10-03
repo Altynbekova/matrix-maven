@@ -1,51 +1,118 @@
 package com.epam.ga.matrixmaven;
+import java.util.Arrays;
+import com.epam.ga.matrixexceptions.IncompatibleSizeException;
+import com.epam.ga.matrixexceptions.MatrixException;
+import com.epam.ga.matrixexceptions.NullMatrixException;
 
- class Matrix {
-    private int size1;
-    private int size2;
+import java.util.Random;
+
+public class Matrix {
     private int[][] array;
 
-    Matrix()
-    {}
+    public  Matrix () {}
 
-    Matrix (int[][] array)
+    public Matrix (int[][] array)
     {
         this.array=array;
-        this.size1=array.length;
-        this.size2=array[0].length;
     }
 
-    static int[][] multiply(Matrix m1, Matrix m2)
+    public static Matrix multiply (Matrix m1, Matrix m2) throws IncompatibleSizeException
     {
-        int[][] result=new int[m1.size1][m2.size2];
-        int sum=0;
+        int i1=m1.getSize1();
+        int j1 = m1.getSize2();
+        int i2=m2.getSize1();
+        int j2 = m2.getSize2();
+        int[][] result=new int[i1][j2];
 
-        if (m1.size2==m2.size1)
+        if (m1==null || m2==null)
+            return null;
+
+        if (j1==i2)
         {
-            for (int i=0; i<m1.size1;i++)
-            {
-                for (int j=0; j<m2.size2;j++)
-                {
-                    for (int k=0; k<m2.size1;k++)
+            for (int i=0; i<i1;i++)
+                for (int j=0; j<j2;j++)
+                    for (int k=0; k<i2;k++)
+                        result[i][j]+=m1.array[i][k]*m2.array[k][j];
+        }
+        else
+        {
+            throw new IncompatibleSizeException();
+        }
 
-                        sum+=m1.array[i][k]*m2.array[k][j];
+        return new Matrix(result);
+    }
 
-                    result[i][j]=sum;
-                    sum=0;
-                }
+    public static void fillMatrix (int i, int j, Matrix m)
+    {
+        int[][] arr=new int[i][j];
+        Random rand = new Random();
+
+        for (int k=0;k<i;k++)
+        {
+            for (int l=0; l<j;l++)
+                arr[k][l]= rand.nextInt(10)+1;
+        }
+        m.setArray(arr);
+    }
+    public static void printMatrix(Matrix m) throws NullMatrixException
+    {
+        if (m!=null) {
+            for (int i = 0; i < m.getSize1(); i++) {
+                for (int j = 0; j < m.getSize2(); j++)
+                    System.out.print(m.array[i][j] + "\t");
+                System.out.println();
             }
         }
-
-        return result;
-    }
-
-    static void printMatrix(Matrix m)
-    {
-        for (int i=0; i<m.size1; i++)
+        else
         {
-            for (int j=0; j<m.size2; j++)
-                System.out.print(m.array[i][j]+"\t");
-            System.out.println();
+            throw new NullMatrixException();
         }
+
     }
+
+    @Override
+    public int hashCode()
+    {
+        final int prime = 31;
+        int hash=1;
+
+        hash=prime*hash+((array==null)?0:Arrays.hashCode(array));
+
+        return hash;
+    }
+    @Override
+    public boolean equals (Object obj)
+    {
+        if (this == obj) return true;
+        if (obj == null || this.getClass() != obj.getClass()){
+            return false;
+        }
+
+        Matrix other = (Matrix) obj;
+
+        return this.array==other.array || (this.array != null && Arrays.equals(this.array,other.array));
+    }
+
+    @Override
+    public String toString ()
+    {
+        return this.array.toString();
+    }
+
+     int getSize1()
+     {
+         return array.length;
+     }
+
+     int getSize2()
+     {
+         return array[0].length;
+     }
+
+     public void setArray(int[][] array)
+     {
+         this.array = array;
+     }
+
+
 }
